@@ -1,0 +1,179 @@
+//PROJECT 3
+class AnagramTree
+{
+	private class TreeNode
+	{
+		private byte[] summary;
+		private WordNode words;
+		private TreeNode left;
+		private TreeNode right;
+		
+		private TreeNode(byte[] summary, WordNode words, TreeNode left, TreeNode right)
+		{
+			this.summary = summary;
+			this.words = words;
+			this.left = left;
+			this.right = right;
+		}
+	}
+	
+	private class WordNode
+	{
+		private String word;
+		private WordNode next;
+		
+		private WordNode(String word, WordNode next)
+		{
+			this.word = word;
+			this.next = next;
+		}
+	}
+	
+	TreeNode head;
+	
+	public AnagramTree()
+	{
+		head = new TreeNode(new byte[26], new WordNode(null, null), null, null); //COME BACK AND FIGURE THIS OUT
+	}
+	
+	public void add(String word)
+	{
+		TreeNode subtree = head;
+		byte[] summary = stringToSummary(word);
+		
+		while(true)
+		{
+			int test = compareSummaries(summary, subtree.summary);
+			if(test > 0)
+			{
+				if(subtree.right == null)
+				{
+					subtree.right = new TreeNode(summary, new WordNode(word, null), null, null);
+					return;
+				}
+				else
+				{
+					subtree = subtree.right;
+				}
+			}
+			else if(test < 0)
+			{
+				if(subtree.left == null)
+				{
+					subtree.left = new TreeNode(summary, new WordNode(word, null), null, null);
+					return;
+				}
+				else
+				{
+					subtree = subtree.left;
+				}
+			}
+			else
+			{
+				WordNode temp = subtree.words;
+				while(temp.next != null)
+				{
+					if(temp.word.equals(word))
+						return;
+					temp = temp.next;
+				}
+				if(temp.word.equals(word))
+					return;
+				temp.next = new WordNode(word, null);
+				return;
+			}
+		}
+	}
+	
+	public void anagrams()
+	{
+		print(head);
+	}
+	
+	private void print(TreeNode subtree)
+	{
+		if(subtree.left != null)
+		{
+			print(subtree.left);
+		}
+		if(subtree.right != null)
+		{
+			print(subtree.right);
+		}
+		if(subtree.words.next != null)
+		{
+			print(subtree.words);
+		}
+	}
+	
+	private void print(WordNode sublist)
+	{
+		while(sublist != null)
+		{
+			System.out.print(sublist.word + " ");
+			sublist = sublist.next;
+		}
+		System.out.println();
+	}
+	
+	private int compareSummaries(byte[] left, byte[] right)
+	{
+		for(int i=0; i<left.length; i++)
+		{
+			if(left[i] != right[i])
+			{
+				return left[i] - right[i];
+			}
+		}
+		return 0;
+	}
+	
+	private byte[] stringToSummary(String word)
+	{
+		byte[] summary = new byte[26];
+		
+		for(int i=0; i<word.length(); i++)
+		{
+			summary[word.charAt(i) - 'a'] += 1;
+		}
+		
+		return summary;
+	}
+}
+
+class Anagrammer
+{
+	public static void main(String[] args)
+	{
+		Words words = new Words("/Users/Ry/Desktop/file.txt"); //First two chapters of war and peace
+		AnagramTree tree = new AnagramTree();
+		while(words.hasNext())
+		{
+			tree.add(words.next());
+		}
+		tree.anagrams();
+	}
+}
+
+/*Output:
+
+no on 
+now own 
+sit its 
+how who 
+slight lights 
+from form 
+for fro 
+quiet quite 
+silent listen 
+left felt 
+fete feet 
+don nod 
+was saw 
+part trap 
+mary army 
+mean name 
+least stale 
+maid amid 
+
+*/
